@@ -119,7 +119,7 @@
 	<div class="content" >
 		<!-- 显示框 -->
 		<input type="text" name="" class="input left">
-		<div class="showselected" v-html="showselected">{{showselected}}</div>
+		<div class="showselected" v-html="showselected" id="showselected" @click="closeselected($event)">{{showselected}}</div>
 		<div class="right-side">   
 			<img src="add.png" width="20px" height="20px" style="margin: 5px;" @click.stop="showDrop">
 		</div>
@@ -172,16 +172,8 @@
 	  	showselected(){
 	  		var showstr="";
 	  		for(let i=0;i<this.myselected.length;i++){
-	  			showstr= showstr+`<span>${this.myselected[i]}<img src="remove.png" width="15px" height="15px" style="margin-top:2px;" id="val${i}"></span>`;
-	  			setTimeout(function(){
-	  				document.getElementById('val'+i).addEventListener("click",function(e){
-	  					this.myselected.remove(this.myselected[i])
-	  					this.$refs.isSelect[i].checked = false;
-	  					e.stopPropagation();
-	  				}.bind(this),false)
-	  			}.bind(this),10)
-	  		}
-	  		
+	  			showstr= showstr+`<span>${this.myselected[i].name}<img src="remove.png" width="15px" height="15px" style="margin-top:2px;" id="val${this.myselected[i].id}"></span>`;
+	  		}	  		
 	  		return showstr;
 	  	}
 	  },
@@ -211,13 +203,10 @@
 	  	select(item){
 	  		//console.log(this.$refs.isSelect[item.id].checked)
 	  		if(this.$refs.isSelect[item.id].checked){
-	  			this.myselected.push(item.name)
+	  			this.myselected.push(item)
 	  		}else{
-	  			this.myselected.remove(item.name)
+	  			this.myselected.remove(item)
 	  		}	  		
-	  	},
-	  	cancel(index){
-	  		this.myselected.remove(index)
 	  	},
 	  	closedrop(e){
 	  		console.log(e.target);
@@ -225,6 +214,18 @@
 	  	},
 	  	setCursorPosition(elem, index) {
 
+		},
+		closeselected(e){
+			if(e.target.nodeName =='IMG'){
+				//console.log(e.target)
+				document.getElementById("showselected").removeChild(e.target.parentNode)
+				var index=parseInt(e.target.id.slice(3,4))
+				this.myselected.forEach((item)=>{
+					if(item.id == index)
+						this.myselected.remove(item);	
+				})							
+				this.$refs.isSelect[index].checked=false;
+			}	
 		}
 	  }
 	});
