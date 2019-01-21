@@ -119,7 +119,7 @@
 	<div class="content" >
 		<!-- 显示框 -->
 		<input type="text" name="" class="input left">
-		<div class="showselected" v-html="showselected" id="showselected" @click="closeselected($event)">{{showselected}}</div>
+		<div class="showselected" v-html="showselected" id="showselected" @click.stop="closeselected($event)">{{showselected}}</div>
 		<div class="right-side">   
 			<img src="add.png" width="20px" height="20px" style="margin: 5px;" @click.stop="showDrop">
 		</div>
@@ -209,7 +209,7 @@
 	  		}	  		
 	  	},
 	  	closedrop(e){
-	  		console.log(e.target);
+	  		//console.log(e.target);
 	  		this.show = false;
 	  	},
 	  	setCursorPosition(elem, index) {
