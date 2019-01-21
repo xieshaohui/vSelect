@@ -8,37 +8,230 @@
 	<!-- use the latest release -->
 	<script src="vue-select.js"></script>
 	<style type="text/css">
-		.wrap{
-			width: 50%;
-			height: 50px;
-		}
 
+		html,body.wrap{
+			width: 100%;
+			height: 100%;
+		}
+		.content{
+			width: 360px;
+			height: 30px;
+			position: relative;
+		}
+		.left{
+			float: left;
+		}
+		.right{
+			float: right;
+		}
+		.main-content{
+			height: inherit;
+		}
+		.right-side{
+			height: inherit;
+			position: absolute;
+			right: 0;
+		}
+		.input{
+			width: 360px;
+			height: 25px;
+		}
+		.drop-down{
+			width: 360px;
+			height: 250px;
+			border:1px solid rgb(245,245,245);
+			box-shadow:rgb(200,200,200) 0px 0px 10px;
+		}
+		.search{
+			height: 40px;
+			background-color: rgb(245,245,245);
+			position: relative;
+		}
+		.search-box{
+			border-radius: 15px;outline:none;
+			border: 1px solid #DBDBDB;
+			height: 27px;
+			width: 82%;
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%,-50%);
+			padding-left: 25px;
+		}
+		p{
+			padding-left: 20px;
+		}
+		
+		input[type="checkbox"]{
+    -webkit-appearance: none;
+    vertical-align:middle;
+    margin-top:0;
+    background:#fff;
+    border:#999 solid 1px;
+    border-radius: 3px;
+    min-height: 16px;
+    min-width: 16px;
+    
+}
+input[type="checkbox"]:checked {
+    background: url("ok.png") no-repeat;
+    background-position: center;
+}
+/*input[type="checkbox"]:checked::after{
+    content: '';
+    top: 3px;
+    left: 3px;
+    position: absolute;
+    background: transparent;
+    border: #fff solid 2px;
+    border-top: none;
+    border-right: none;
+    height: 6px;
+    width: 10px;
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg); 
+    transform: rotate(-45deg);
+}*/
+	.showselected{
+		height: 30px;
+		width: 340px;
+		position: absolute;
+		top: 3px;
+		left: 0;
+	}
+	.showselected span{
+		border-radius: 25px;
+		background-color: rgb(45,115,222);
+		padding: 4px;
+		height: 25px;
+		line-height: 25px;
+		color: white;
+		font-size: 15px;
+		margin: 0 2px;
+		font-weight: lighter;
+	}
+	.checkbox{
+		
+	}
 	</style>
 </head>
-<body>
-	<div id="app" class="wrap">
-	<v-select  class="select" multiple  :options="options" label="name" :value.sync="myselected"></v-select>
+<body >
+	<div id="app" class="wrap" @click.stop="closedrop">
+	<!-- <v-select   multiple  :options="options" label="name" :value.sync="myselected"></v-select> -->
 	<!-- <h6>{{myselected}}</h6> -->
+
+	<div class="content" >
+		<!-- 显示框 -->
+		<input type="text" name="" class="input left">
+		<div class="showselected" v-html="showselected">{{showselected}}</div>
+		<div class="right-side">   
+			<img src="add.png" width="20px" height="20px" style="margin: 5px;" @click.stop="showDrop">
+		</div>
+	</div>
+	<div class="drop-down" ref="drop" v-show="show">
+		<!-- 搜索框 -->
+		<div class="search"><img src="search.png" width="20px" height="20px" style="position: absolute;left: 6%;top: 10px;z-index: 1000"> <input type="text" name="" placeholder="搜索" class="search-box" v-model="searchkeys" @click.stop > </div>
+		<!-- 选项框 -->
+		<div class="options" >
+			<p  v-for="item in options" v-show="item.show" >
+				<input type="checkbox"  type="radio" :id="item.id" class="checkbox" ref="isSelect" @click.stop="select(item)"><label style="position: absolute;left: 60px; width: 300px" :for="item.id" @click.stop >{{item.name}}</label>
+			</p>			
+		</div>
+	</div>
 	</div>
 
 </body>
 </html>
 <script type="text/javascript">
-	Vue.component('v-select', VueSelect.VueSelect);
+	// Vue.component('v-select', VueSelect.VueSelect);
+	Array.prototype.indexOf = function(val) { 
+		for (var i = 0; i < this.length; i++) { 
+			if (this[i] == val) return i; 
+		} 
+		return -1; 
+	};
+	Array.prototype.remove = function(val) { 
+		var index = this.indexOf(val); 
+		if (index > -1) { 
+			this.splice(index, 1); 
+		} 
+	};
 	new Vue({
 	  el: '#app',
 	  data: function(){
 	  	return{
 			options: [
-				{name: '变更中', id: 1}, 
-				{name: '未生效', id: 2}, 
-				{name: '作废', id: 3}, 
-				{name: '正常', id: 4}, 
-				{name: '审核中', id: 5}
+				{name: '变更中', id: 0,show:true}, 
+				{name: '未生效', id: 1,show:true}, 
+				{name: '作废', id: 2,show:true}, 
+				{name: '正常', id: 3,show:true}, 
+				{name: '审核中', id: 4,show:true}
 				],	
-			myselected:[] 	  		
+			myselected:[],
+			show:false,
+			searchkeys:"" 		
+	  	}			  
+	  },
+	  computed:{
+	  	showselected(){
+	  		var showstr="";
+	  		for(let i=0;i<this.myselected.length;i++){
+	  			showstr= showstr+`<span>${this.myselected[i]}<img src="remove.png" width="15px" height="15px" style="margin-top:2px;" id="val${i}"></span>`;
+	  			setTimeout(function(){
+	  				document.getElementById('val'+i).addEventListener("click",function(e){
+	  					this.myselected.remove(this.myselected[i])
+	  					this.$refs.isSelect[i].checked = false;
+	  					//e.stopPropogation();
+	  				}.bind(this),false)
+	  			}.bind(this),0)
+	  		}
+	  		
+	  		return showstr;
 	  	}
-				  
+	  },
+	  mounted:function(){
+	  	
+	  },
+	  watch:{
+	  	searchkeys(value){
+	  		if(value.length >0){
+	  			for(var i=0;i<this.options.length;i++){
+	  			//console.log(value)
+	  			if(!this.options[i].name.includes(value)){
+	  					this.options[i].show = false;
+	  				}
+	  			}
+	  		}else{
+	  			this.options.forEach((item)=>item.show = true)
+	  		}
+	  		
+	  	}
+	  },
+	  methods:{
+	  	showDrop(){
+	  		this.show=!this.show;
+	  		console.log(this.$refs.drop);
+	  	},
+	  	select(item){
+	  		console.log(this.$refs.isSelect[item.id].checked)
+	  		if(this.$refs.isSelect[item.id].checked){
+	  			this.myselected.push(item.name)
+	  		}else{
+	  			this.myselected.remove(item.name)
+	  		}
+	  		
+	  	},
+	  	cancel(index){
+	  		this.myselected.remove(index)
+	  	},
+	  	closedrop(e){
+	  		console.log(e.target);
+	  		this.show = false;
+	  	},
+	  	setCursorPosition(elem, index) {
+
+		}
 	  }
 	});
 	
